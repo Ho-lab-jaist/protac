@@ -21,7 +21,7 @@ def get_free_node_ind(node_idx_path, label_idx_path):
 
     return file_idx
 
-full_path = '/home/protac/ros/protac_ws/src/protac_control/resource'
+full_path = '/home/protac/ros/protac_ws/src/protac_perception/resource'
 class TactilePerception(object):
     def __init__(self, tacnet_dir=full_path,
                        trained_model = 'TacNet_Unet_real_data.pt',
