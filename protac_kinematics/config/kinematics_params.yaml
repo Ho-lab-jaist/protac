@@ -1,0 +1,28 @@
+robot_name: protac
+init_pose: 
+        [1,  0,  0,        0,
+         0,  1,  0,    -0.01,
+         0,  0,  1,     0.92,
+         0,  0,  0,        1]
+screw_axis_body_frame:
+        [   0,       0,         0,    0,
+            0,       1,        -1,    0,
+            1,       0,         0,    1,
+          0.01,   0.761,    -0.361,    0,
+            0,       0,         0,    0,
+            0,       0,         0,    0]
+screw_axis_space_frame:
+        [ 0,       0,        0,      0,
+          0,       1,       -1,      0,
+          1,       0,        0,      1,
+          0,  -0.159,    0.559,  -0.01,
+          0,       0,        0,      0,
+          0,       0,        0,      0]
+upper_arm_length: 0.4
+forearm_arm_length: 0.361
+elbow_offset : 0.01
+base_shoulder_distance: 0.159
+joint1_range: [-160, 160]
+joint2_range: [-160, 160]
+joint3_range: [-160, 160]
+joint4_range: [-160, 160]
