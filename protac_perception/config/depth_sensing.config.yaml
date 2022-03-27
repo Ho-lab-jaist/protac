@@ -1,0 +1,39 @@
+cam1: 
+  depth_sensing_node:
+    ros__parameters:
+      model_weights: "/home/protac/ros/protac_ws/src/protac_perception/resource/midas/weights"
+      model_type: "dpt_large"
+      optimize: true
+      show_fps: true
+      raw_append: true
+      output: "/home/protac/ros/protac_ws/src/protac_perception/resource/midas/outputs/test_depth_cam1.mp4"
+
+cam2: 
+  depth_sensing_node:
+    ros__parameters:
+      model_weights: "/home/protac/ros/protac_ws/src/protac_perception/resource/midas/weights"
+      model_type: "dpt_large"
+      optimize: true
+      show_fps: true
+      raw_append: true
+      output: "/home/protac/ros/protac_ws/src/protac_perception/resource/midas/outputs/test_depth_cam2.mp4"
+
+cam3: 
+  depth_sensing_node:
+    ros__parameters:
+      model_weights: "/home/protac/ros/protac_ws/src/protac_perception/resource/midas/weights"
+      model_type: "dpt_large"
+      optimize: true
+      show_fps: true
+      raw_append: true
+      output: "/home/protac/ros/protac_ws/src/protac_perception/resource/midas/outputs/test_depth_cam3.mp4"
+
+cam4: 
+  depth_sensing_node:
+    ros__parameters:
+      model_weights: "/home/protac/ros/protac_ws/src/protac_perception/resource/midas/weights"
+      model_type: "dpt_large"
+      optimize: true
+      show_fps: true
+      raw_append: true
+      output: "/home/protac/ros/protac_ws/src/protac_perception/resource/midas/outputs/test_depth_cam4.mp4"
