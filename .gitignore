@@ -35,7 +35,6 @@
 
 # (Config) model files
 *.pt
-*.cfg
 *.weights
 
 # Video
@@ -47,7 +46,6 @@
 # Data file
 *.csv
 *.vtk
-
 
 dynamixel-workbench
 dynamixel-workbench-msgs
