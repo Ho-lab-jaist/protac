@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot name="protac" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find protac_description)/urdf/protac.xacro" />
+  <xacro:include filename="$(find protac_description)/urdf/protac.ros2_control_gazebo_velocity.xacro" />
+
+  <link name="world"/>
+
+  <xacro:protac parent="world">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:protac>
+
+  <xacro:protac_ros2_control name="protac_ros2_control" />
+</robot>
