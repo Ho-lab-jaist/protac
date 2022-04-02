@@ -24,10 +24,10 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'contact_sensing_node = protac_perception.contact_sensing_node:main',
             'img_publisher = protac_perception.img_pub:main',
+            'contact_sensing_node = protac_perception.contact_sensing_node:main',
+            'obstacle_sensing_node = protac_perception.obstacle_sensing_node:main',
             'distance_sensing_node = protac_perception.distance_sensing_node:main',
-            'depth_sensing_node = protac_perception.depth_sensing_node:main',
         ],
     },
 )

@@ -17,8 +17,8 @@ def generate_launch_description():
     img1_depth_sensing = Node(
         package="protac_perception",
         namespace="cam1",
-        executable="depth_sensing_node",
-        name='depth_sensing_node',
+        executable="distance_sensing_node",
+        name='distance_sensing_node',
         parameters = [config],
         remappings=[
         ('/video_frames', '/cam1/video_frames'),
@@ -28,8 +28,8 @@ def generate_launch_description():
     img2_depth_sensing = Node(
         package="protac_perception",
         namespace="cam2",
-        executable="depth_sensing_node",
-        name='depth_sensing_node',
+        executable="distance_sensing_node",
+        name='distance_sensing_node',
         parameters = [config],
         remappings=[
         ('/video_frames', '/cam2/video_frames'),
@@ -39,8 +39,8 @@ def generate_launch_description():
     img3_depth_sensing = Node(
         package="protac_perception",
         namespace="cam3",
-        executable="depth_sensing_node",
-        name='depth_sensing_node',
+        executable="distance_sensing_node",
+        name='distance_sensing_node',
         parameters = [config],
         remappings=[
         ('/video_frames', '/cam3/video_frames'),
@@ -51,8 +51,8 @@ def generate_launch_description():
     img4_depth_sensing = Node(
         package="protac_perception",
         namespace="cam4",
-        executable="depth_sensing_node",
-        name='depth_sensing_node',
+        executable="distance_sensing_node",
+        name='distance_sensing_node',
         parameters = [config],
         remappings=[
         ('/video_frames', '/cam4/video_frames'),
@@ -60,8 +60,8 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        img1_depth_sensing,
-        img2_depth_sensing,
+        # img1_depth_sensing,
+        # img2_depth_sensing,
         img3_depth_sensing,
         img4_depth_sensing,
     ])

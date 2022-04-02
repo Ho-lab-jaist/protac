@@ -249,6 +249,24 @@ class DepthProcessing():
 
         self.model.to(self.device)
 
+
+        # Intrinsic camera calibration matrix
+        self.K = np.array([[239.35312993382436, 0.00000000000000, 308.71493813687908],
+                           [0.00000000000000, 239.59440270542146, 226.24771387864561],
+                           [0.00000000000000, 0.00000000000000, 1.00000000000000]])
+
+        # Create a 2D image gird points
+        x_arr = np.linspace(0, 639, 640)
+        y_arr = np.linspace(0, 479, 480)
+        self.X_img, self.Y_img = np.meshgrid(x_arr, y_arr)
+        
+        # Create a mask where there is a presence of fixed sensor parts
+        normalized_gird_u = self.X_img - self.K[0, 2]
+        normalized_gird_v = self.Y_img - self.K[1, 2]
+        mask_u = np.logical_and(normalized_gird_u > -50, normalized_gird_u < 50)
+        mask_v = np.logical_and(normalized_gird_v > -50, normalized_gird_v < 50)
+        self.MASK = np.logical_not(np.logical_and(mask_u, mask_v))
+
     def run(self, frame):
         """ Run depth prediction and return raw depth distance
         """
@@ -314,6 +332,44 @@ class DepthProcessing():
             return np.concatenate((cv2.cvtColor(encoded_depth, cv2.COLOR_GRAY2RGB), self.frame), axis=1)
         else:
             return cv2.cvtColor(encoded_depth, cv2.COLOR_GRAY2RGB)
+
+    def disparity2depth(self, disparity, dsp_const):
+        """ Convert disparity to depth
+        - Parameters:
+        @disparity (float): disparity of the target point
+        @dsp_const (float): disparity constant (f*b)
+
+        - Returns:
+        (float): depth of the target point    
+        """
+        self.depth = dsp_const/disparity
+        return self.depth
+
+    def back_projection(self, depth, img_point=None):
+        """ Compute 3D point from the image point (pixel) and depth information (metrics)
+        - Parameters:
+        @img_point (nd.array; (2,)): the target point on image plane (x, y)
+        @depth (float): the estimated depth
+        @K (nd.array): the intrinsic calibration matrix
+        - Returns:
+        (nd.array; (3,)): 3D coordinate of the target point w.r.t the camera reference frame {C}
+        """
+        fx = self.K[0, 0]
+        fy = self.K[1, 1]
+        u0 = self.K[0, 2]
+        v0 = self.K[1, 2]
+
+        if img_point is None:
+            u = self.X_img
+            v = self.Y_img 
+        else:
+            u = img_point[0]
+            v = img_point[1]
+
+        x = np.multiply(depth, (u-u0)/fx)
+        y = np.multiply(depth, (v-v0)/fy)
+
+        return np.array([x, y, depth])
 
 
 if __name__ == "__main__":

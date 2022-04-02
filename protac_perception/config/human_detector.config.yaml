@@ -6,7 +6,7 @@ cam1:
       config: "/home/protac/ros/protac_ws/src/protac_perception/resource/models/yolov3.cfg"
       weights: "/home/protac/ros/protac_ws/src/protac_perception/resource/models/yolov3.weights"
       class_names: "/home/protac/ros/protac_ws/src/protac_perception/resource/models/coco.names"
-      device: "cpu"
+      device: "cuda"
       output: "/home/protac/ros/protac_ws/src/protac_perception/resource/outputs/test-yolo-cam1.mp4"
       show_fps: true
       verbose: true
@@ -19,7 +19,7 @@ cam2:
       config: "/home/protac/ros/protac_ws/src/protac_perception/resource/models/yolov3.cfg"
       weights: "/home/protac/ros/protac_ws/src/protac_perception/resource/models/yolov3.weights"
       class_names: "/home/protac/ros/protac_ws/src/protac_perception/resource/models/coco.names"
-      device: "cpu"
+      device: "cuda"
       output: "/home/protac/ros/protac_ws/src/protac_perception/resource/outputs/test-yolo-cam2.mp4"
       show_fps: true
       verbose: true

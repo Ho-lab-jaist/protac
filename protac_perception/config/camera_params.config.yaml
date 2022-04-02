@@ -2,7 +2,7 @@ cam1:
   img_publisher_node:
     ros__parameters:
       image_undistored: true
-      cam_id: 2
+      cam_id: 4
       width: 640
       height: 480
       k_new: 0.9
@@ -15,7 +15,7 @@ cam2:
   img_publisher_node:
     ros__parameters:
       image_undistored: true
-      cam_id: 6
+      cam_id: 2
       width: 640
       height: 480
       k_new: 0.9
@@ -41,7 +41,7 @@ cam4:
   img_publisher_node:
     ros__parameters:
       image_undistored: true
-      cam_id: 4
+      cam_id: 6
       width: 640
       height: 480
       k_new: 0.9

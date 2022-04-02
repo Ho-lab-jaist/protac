@@ -1,11 +1,5 @@
 import modern_robotics as mr
 
-import rclpy
-from rclpy.node import Node
-
-from tf2_msgs.msg import TFMessage
-from sensor_msgs.msg import JointState
-
 import tf_transformations as tf
 import numpy as np
 
@@ -26,6 +20,9 @@ class Kinematics():
         with open(kinematics_params_dir) as file:
             self.kinematics_params_ = yaml.full_load(file)
     
+
+        # Rotation matrix between base and world frame
+        self.Rws = np.array(self.kinematics_params_['Rws']).reshape((3, 3))
         # initial effector pose w.r.t space frame
         self.M_ = np.array(self.kinematics_params_['init_pose']).reshape((4, 4))
         # Blist: the joint screw axes in the end-effector frame when the protac is
@@ -43,9 +40,6 @@ class Kinematics():
         self.joint2_range_ = self.kinematics_params_['joint2_range']
         self.joint3_range_ = self.kinematics_params_['joint3_range']
         self.joint4_range_ = self.kinematics_params_['joint4_range']
-
-    def js_listener(self, msg):
-        self.joint_states_ = np.array(msg.position)
 
     def FKinBody(self, thetalist):
         return mr.FKinBody(self.M_, self.Blist_, thetalist)
@@ -71,7 +65,6 @@ class Kinematics():
         Equivalent to IKinBody, except the joint screw axes are specified in the space frame.
         """
         return mr.IKinSpace(self.Slist_, self.M_, T, thetalist0, eomg=eomg, ev=ev)
-
 
     def IKinPos(self, p):
         """
@@ -140,6 +133,23 @@ class Kinematics():
         else:
             return valid_solution
 
+    def FindClosestIksolution(self, p, qseed):
+        """Find the closest inverse kinematics solution 
+        relative to the seed value (qseed)
+
+        :param p: the target eef position of protac arm
+        :param qseed: The seed joint values to which solutions compare against.
+        :return: the closest ik solution to the seed.
+        """
+
+        solutions = self.IKinPos(p)
+        if len(solutions) > 0:
+            distances = [sum((qseed-qsol)**2) for qsol in solutions]
+            closest = np.argmin(distances)
+            return solutions[closest]
+        else:
+            return None
+
     def JacobianBody(self, thetalist):
         return mr.JacobianBody(self.Blist_, thetalist)
 
@@ -197,16 +207,29 @@ class Kinematics():
 
 def main():
     kin = Kinematics()
-    thetalist = np.deg2rad(np.array([-160, 160, -160, 0]))
+    Rws = kin.Rws
+    # thetalist = np.deg2rad(np.array([-30, 10, -60, 0.]))
+    thetalist = np.array([0.0, -1.308996939, -2.094395102, 0.0])
     # print(thetalist)
 
     T_eef = kin.FKinSpace(thetalist)
-    P = [0.3, -0.2, 0.4]
+    # eef position in fixed space/base {s} frame
+    ps = T_eef[:3, 3]
+    # eef position in fixed world {w} frame
+    pw = np.dot(Rws, ps)
+    # P = [0.3, -0.2, 0.4]
+    # pw_target = [0.223, 0.04, 0.459]
+    pw_target = [0.273, -0.04,   0.459]
+    ps_target = np.dot(Rws.T, pw_target)
     # i_thetalist = kin.IKinPos(T_eef[:3, 3])
-    i_thetalist = kin.IKinPos(P)
+    i_thetalist = kin.IKinPos(ps_target)
 
-    print('End-effector pose:\n {}'.format(T_eef))
-    print(np.rad2deg(i_thetalist))
+    print('End-effector position in space {{s}} frame:\n {}'.format(ps))
+    print('End-effector position in world {{w}} frame:\n {}'.format(pw))
+    print('============================================================')
+    print('Target end-effector position in space {{s}} frame:\n {}'.format(ps_target))
+    print('Target end-effector position in world {{w}} frame:\n {}'.format(pw_target))
+    print('============================================================')
     for theta in i_thetalist:
         print('Computed joint(deg): {}'.format(np.rad2deg(theta)))
         print('Computed joint(rad): {}'.format(theta))

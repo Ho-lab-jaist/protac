@@ -30,6 +30,7 @@ setup(
             'position_control_node = protac_control.position_control_node:main',
             'velocity_control_node = protac_control.velocity_control_node:main',
             'online_position_control_node = protac_control.online_position_control_node:main',
+            'human_aware_speed_control_node = protac_control.human_aware_speed_control_node:main',
             'distance_reactive_control_node = protac_control.distance_reactive_control_node:main',
         ],
     },

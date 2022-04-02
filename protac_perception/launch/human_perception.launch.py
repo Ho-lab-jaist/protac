@@ -17,8 +17,8 @@ def generate_launch_description():
     img1_distance_sensing = Node(
         package="protac_perception",
         namespace="cam1",
-        executable="distance_sensing_node",
-        name='distance_sensing_node',
+        executable="obstacle_sensing_node",
+        name='obstacle_sensing_node',
         parameters = [config],
         remappings=[
         ('/video_frames', '/cam1/video_frames'),
@@ -29,8 +29,8 @@ def generate_launch_description():
     img2_distance_sensing = Node(
         package="protac_perception",
         namespace="cam2",
-        executable="distance_sensing_node",
-        name='distance_sensing_node',
+        executable="obstacle_sensing_node",
+        name='obstacle_sensing_node',
         parameters = [config],
         remappings=[
         ('/video_frames', '/cam2/video_frames'),
@@ -41,8 +41,8 @@ def generate_launch_description():
     img3_distance_sensing = Node(
         package="protac_perception",
         namespace="cam3",
-        executable="distance_sensing_node",
-        name='distance_sensing_node',
+        executable="obstacle_sensing_node",
+        name='obstacle_sensing_node',
         parameters = [config],
         remappings=[
         ('/video_frames', '/cam3/video_frames'),
@@ -53,8 +53,8 @@ def generate_launch_description():
     img4_distance_sensing = Node(
         package="protac_perception",
         namespace="cam4",
-        executable="distance_sensing_node",
-        name='distance_sensing_node',
+        executable="obstacle_sensing_node",
+        name='obstacle_sensing_node',
         parameters = [config],
         remappings=[
         ('/video_frames', '/cam4/video_frames'),
@@ -63,8 +63,8 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        img1_distance_sensing,
-        img2_distance_sensing,
+        # img1_distance_sensing,
+        # img2_distance_sensing,
         img3_distance_sensing,
         img4_distance_sensing,
     ])
