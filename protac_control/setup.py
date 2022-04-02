@@ -26,7 +26,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'simple_control_node = protac_control.simple_control_node:main',
+            'joint_space_control_node = protac_control.joint_space_control_node:main',
             'position_control_node = protac_control.position_control_node:main',
             'velocity_control_node = protac_control.velocity_control_node:main',
             'online_position_control_node = protac_control.online_position_control_node:main',
