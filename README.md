@@ -1,2 +1,2 @@
 # protac
-Data, software for sensing/perception and controlling ProTac arm
+Data samples and software which includes programs for high-level sensing/perception and control of Protac arm.
