@@ -179,9 +179,9 @@ class DepthSensing(Node):
         closest_point = point_clound[:, closest_distance_idx[0], closest_distance_idx[1]]
         repulsive_vector_magnitude = self.Vmax/(1+np.exp(self.alpha*closest_distance*2/self.dmax-self.alpha))
         if closest_point[0] < 0:
-            reactive_data.data = repulsive_vector_magnitude
-        else:
             reactive_data.data = -repulsive_vector_magnitude
+        else:
+            reactive_data.data = repulsive_vector_magnitude
         # distance = Float64()
         # depth = Float64()
         # distance.data = float(closest_distance)

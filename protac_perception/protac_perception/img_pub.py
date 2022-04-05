@@ -50,9 +50,6 @@ class ImagePublisher(Node):
     self.K_new[(0, 1), (0, 1)] = self.k_new * self.K_new[(0, 1), (0, 1)]
     self.D = np.array(self.get_parameter('d').get_parameter_value().double_array_value)
     self.undistored = np.array(self.get_parameter('image_undistored').get_parameter_value().bool_value)
-
-    self.get_logger().info('{}'.format(self.K.shape))
-
     self.grabbed, self.frame = self.cap.read()
     self.stopped = False
          

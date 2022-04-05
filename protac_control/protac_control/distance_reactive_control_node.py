@@ -37,8 +37,8 @@ class DistanceReactiveController(JointControllerBase):
         self.stiffness = 10. # 5.5
         self.damping_coeff = 0.5
         self.speed_limit = 0.5 # limits for velocity
-        self.x_limit_upper = np.array([-0.167,  0.04, 0.482]) # reaction limit
-        self.x_limit_lower = np.array([-0.167,  0.04, 0.482]) # reaction limit
+        self.x_limit_upper = np.array([-0.131, 0.04, 0.518]) # reaction limit
+        self.x_limit_lower = np.array([-0.131, -0.04, 0.518]) # reaction limit
         # pre-planned direction of distance
         self.reactive_direction = (self.x_limit_upper-self.xe)/np.linalg.norm(self.x_limit_upper-self.xe)
         # initialize reactive magnitude
@@ -59,7 +59,6 @@ class DistanceReactiveController(JointControllerBase):
             elif np.linalg.norm(x_t - self.x_limit_lower) < np.linalg.norm(x_t - self.x_limit_upper):
                 return self.x_limit_lower
         else:
-            print("Hello2")
             return x_t
 
     def jonit_trajectory_generation(self):
