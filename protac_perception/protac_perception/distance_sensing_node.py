@@ -142,7 +142,7 @@ class DepthSensing(Node):
     self.declare_parameter('output', "/home/protac/ros/protac_ws/src/protac_perception/resource/midas/outputs/test-depth.mp4", output_descriptor)
 
     # parameters for to-skin-distance based repulsive vector
-    self.Vmax = 1.2 # maximum admissible magnitude # 0.6
+    self.Vmax = 0.9 # maximum admissible magnitude # 0.6
     self.alpha = 6 # shape factor
     self.dmax = 0.6 # the maximum to-skin-distance at which the repulsive vector approaches zero.
 
