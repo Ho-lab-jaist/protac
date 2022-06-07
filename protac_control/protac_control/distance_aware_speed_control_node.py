@@ -1,3 +1,4 @@
+from turtle import distance
 import rclpy
 from rclpy.node import Node
 
@@ -19,17 +20,17 @@ class DistanceReactiveController(JointControllerBase):
 
         self.subscription_cam3 = self.create_subscription(
             Float64,
-            '/cam3/protac_perception/object_area',
+            '/protac_perception/closest_distance',
             self.cam3_distance_callback,
             10)
         self.subscription_cam3  # prevent unused variable warning
 
-        self.subscription_cam4 = self.create_subscription(
-            Float64,
-            '/cam4/protac_perception/object_area',
-            self.cam4_distance_callback,
-            10)
-        self.subscription_cam4  # prevent unused variable warning
+        # self.subscription_cam4 = self.create_subscription(
+        #     Float64,
+        #     '/cam4/protac_perception/object_area',
+        #     self.cam4_distance_callback,
+        #     10)
+        # self.subscription_cam4  # prevent unused variable warning
 
         # load kinematics module for protac (protac_kinematics package)
         self.kinematics = Kinematics()
@@ -49,13 +50,12 @@ class DistanceReactiveController(JointControllerBase):
         self.trajectory_generation = self.jonit_trajectory_generation(ps, pe, Tf, 3)
 
         self.proximity = False
-        self.distance_threshold = 55000
+        self.distance_threshold = 0.35
         self.count = 0
         self.count_detect = 0
 
         # message for velocity command
         self.setpoint_velocity = Vector3()
-
 
     def jonit_trajectory_generation(self, pointstart, pointend, Tf, method):
         paths = [{"start": pointstart, "end": pointend, "duration": Tf}, {"start": pointend, "end": pointstart, "duration": Tf}]
@@ -100,31 +100,31 @@ class DistanceReactiveController(JointControllerBase):
 
     def cam3_distance_callback(self, msg):
         # self.get_logger().info('I heard: "%s"' % msg.data)
-        area = msg.data
-        if area > self.distance_threshold:
+        distance = msg.data
+        if distance < self.distance_threshold and distance > 0.15:
             self.count_detect+=1
             if self.count_detect==2:
                 self.proximity = True
                 self.count = 0
         else:
             self.count+=1
-            if self.count==13:
+            if self.count==5:
                 self.proximity= False
                 self.count_detect = 0
 
-    def cam4_distance_callback(self, msg):
-        # self.get_logger().info('I heard: "%s"' % msg.data)
-        area = msg.data
-        if area > self.distance_threshold:
-            self.count_detect+=1
-            if self.count_detect==2:
-                self.proximity = True
-                self.count = 0
-        else:
-            self.count+=1
-            if self.count==13:
-                self.proximity= False
-                self.count_detect = 0
+    # def cam4_distance_callback(self, msg):
+    #     # self.get_logger().info('I heard: "%s"' % msg.data)
+    #     area = msg.data
+    #     if area > self.distance_threshold:
+    #         self.count_detect+=1
+    #         if self.count_detect==2:
+    #             self.proximity = True
+    #             self.count = 0
+    #     else:
+    #         self.count+=1
+    #         if self.count==10:
+    #             self.proximity= False
+    #             self.count_detect = 0
 
 
 def main(args=None):

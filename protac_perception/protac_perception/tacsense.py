@@ -8,6 +8,8 @@ import pandas as pd
 
 from .dlmodel import TacNet
 
+from .mcl import mcl
+
 def get_free_node_ind(node_idx_path, label_idx_path):
     df_node_idx = pd.read_csv(node_idx_path)
     df_label_idx = pd.read_csv(label_idx_path)
@@ -21,11 +23,11 @@ def get_free_node_ind(node_idx_path, label_idx_path):
 
     return file_idx
 
-full_path = '/home/protac/ros/protac_ws/src/protac_control/resource'
+full_path = '/home/protac/ros/protac_ws/src/protac_perception/resource'
 class TactilePerception(object):
     def __init__(self, tacnet_dir=full_path,
                        trained_model = 'TacNet_Unet_real_data.pt',
-                       cam_ind = [0, 2],
+                       cam_ind = [10, 8],
                        num_of_nodes = 707,
                        node_idx_path=os.path.join(full_path,'node_idx.csv'), 
                        label_idx_path=os.path.join(full_path,'label_idx.csv')):
@@ -148,15 +150,45 @@ class TactilePerception(object):
         full_node_displacements = self.estimate_skin_deformation()
         nodes_depth = np.linalg.norm(full_node_displacements, axis=1)
         # extract nodes where depth > epsilon = 5 mm
-        touched_nodes_depth = nodes_depth[(nodes_depth > 4.5)]
+        touched_nodes_depth = nodes_depth[(nodes_depth > 2)]
         # the number of touched nodes
         num_of_touched_nodes = len(touched_nodes_depth)
         return True if num_of_touched_nodes > 2 else False
 
+    def extract_contact_positions(self):
+        """
+        Extract the contact positions acting on the TacLink
+        """
+        _, contact_positions = mcl(self.estimate_skin_deformation(), 2)
+        return contact_positions
+
+
 if __name__ == "__main__":
-    tacitle_perception = TactilePerception()
+    tacitle_perception = TactilePerception()    
+    contact_count = 0
     while True:
-        if tacitle_perception.detect_contact():
-            print('Contact')
+        contact_positions = tacitle_perception.extract_contact_positions()
+        if tacitle_perception.detect_contact() and len(contact_positions)==1:
+            print('Contact: {0}'.format(len(contact_positions)))
+            contact_count +=1
+            current_position = contact_positions[0]
+            if contact_count>=4:
+                directional_vector = current_position-prev_position
+                distance = np.linalg.norm(directional_vector)
+                if distance > 4: # unit: mm
+                    # print(directional_vector[2])
+                    if directional_vector[2] > 0:
+                        sign = "+"
+                    else:
+                        sign = "-"
+                    print("Stroke Detected ({0})".format(sign))
+                else:
+                    # print(distance)
+                    print("Press Detected")
+            prev_position = current_position
+        elif tacitle_perception.detect_contact() and len(contact_positions)>=2:
+            # print('Multi-point contact: {0}'.format(len(contact_positions)))
+            pass
         else:
-            print('No')
+            print('No: {0}'.format(len(contact_positions)))
+            contact_count = 0

@@ -7,61 +7,57 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     package_name = "protac_perception"
-    config = os.path.join(
-    get_package_share_directory(package_name),
-    'config',
-    'depth_sensing.config.yaml'
-    )
+    # config = os.path.join(
+    # get_package_share_directory(package_name),
+    # 'config',
+    # 'depth_sensing.config.yaml'
+    # )
 
 
-    img1_depth_sensing = Node(
+    img1_show = Node(
         package="protac_perception",
         namespace="cam1",
-        executable="distance_sensing_node",
-        name='distance_sensing_node',
-        parameters = [config],
+        executable="image_display_node",
+        name='image_display_node',
         remappings=[
         ('/video_frames', '/cam1/video_frames'),
         ]
     )
 
-    img2_depth_sensing = Node(
+    img2_show = Node(
         package="protac_perception",
         namespace="cam2",
-        executable="distance_sensing_node",
-        name='distance_sensing_node',
-        parameters = [config],
+        executable="image_display_node",
+        name='image_display_node',
         remappings=[
         ('/video_frames', '/cam2/video_frames'),
         ]
     )
 
-    img3_depth_sensing = Node(
+    img3_show = Node(
         package="protac_perception",
         namespace="cam3",
-        executable="distance_sensing_node",
-        name='distance_sensing_node',
-        parameters = [config],
+        executable="image_display_node",
+        name='image_display_node',
         remappings=[
         ('/video_frames', '/cam3/video_frames'),
         ]
     )
 
-
-    img4_depth_sensing = Node(
+    img4_show = Node(
         package="protac_perception",
         namespace="cam4",
-        executable="distance_sensing_node",
-        name='distance_sensing_node',
-        parameters = [config],
+        executable="image_display_node",
+        name='image_display_node',
         remappings=[
         ('/video_frames', '/cam4/video_frames'),
         ]
     )
 
+
     return LaunchDescription([
-        # img1_depth_sensing,
-        # img2_depth_sensing,
-        img3_depth_sensing,
-        # img4_depth_sensing,
+        # img1_show,
+        # img2_show,
+        img3_show,
+        # img4_show,
     ])

@@ -3,7 +3,6 @@ from rclpy.node import Node
 
 from std_msgs.msg import Float64MultiArray
 from std_msgs.msg import Float64
-from geometry_msgs.msg import Vector3
 import numpy as np
 
 from protac_kinematics.kinematics import Kinematics
@@ -14,7 +13,6 @@ class DistanceReactiveController(JointControllerBase):
         super().__init__(namespace, timeout=timeout)
 
         self.publisher_ = self.create_publisher(Float64MultiArray, '/position_controller/commands', 10)
-        self.vel_publisher_ = self.create_publisher(Vector3, '/position_controller/velocity_setpoint', 10)
 
         self.subscription_cam3 = self.create_subscription(
             Float64,
@@ -30,13 +28,9 @@ class DistanceReactiveController(JointControllerBase):
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.ts = timer_period # sampling time
 
-        # pe = np.array([-0.167,  0.04, 0.482])
-        # ps = np.array([0.3, -0.3, 0.4])
-        # pe = np.array([0.3, 0.3, 0.4])
-
         # controller paramters
         self.xe = np.array([-0.131, -0.01, 0.518]) # equiblirium position
-        self.stiffness = 10. # 5.5
+        self.stiffness = 5.5 # 5.5
         self.damping_coeff = 0.5
         self.speed_limit = 0.5 # limits for velocity
         self.x_limit_upper = np.array([-0.131, 0.04, 0.518]) # reaction limit
@@ -45,14 +39,13 @@ class DistanceReactiveController(JointControllerBase):
         self.reactive_direction = (self.x_limit_upper-self.xe)/np.linalg.norm(self.x_limit_upper-self.xe)
         # initialize reactive magnitude
         self.reactive_magnitude = 0.
+        # initialize the generator of desired_trajectory
+        self.trajectory_generation = self.desired_trajectory_generation(self.x_limit_lower, self.x_limit_upper, 8)
         # initialize the generator of reactive-based joint commands
-        self.trajectory_generation = self.jonit_trajectory_generation()
+        self.joint_command_generation = self.jonit_trajectory_generation()
 
         # message for joint position control
         self.joint_msg = Float64MultiArray()
-
-        # message for velocity command
-        self.setpoint_velocity = Vector3()
 
     def validate_reactive_path(self, x_t):
         """ Constraint the reactive path to a straigh line
@@ -66,24 +59,34 @@ class DistanceReactiveController(JointControllerBase):
         else:
             return x_t
 
+
+    def desired_trajectory_generation(self, pointstart, pointend, Tf):
+        N = Tf/self.ts + 1.0
+        traj, trajdot = self.kinematics.LineTrajectoryGeneration(pointstart, pointend, Tf, N, 3)
+        traj = np.concatenate((traj, np.flip(traj, axis=0)))
+        trajdot = np.concatenate((trajdot, -trajdot))
+        while True:
+            for point in traj:
+                yield point
+
+
     def jonit_trajectory_generation(self):
         while True:
             # current state (position of the robot)
             x = self.get_eef_positions()
+            # reactive velocity (constrained on pre-planned direction) that pushes robot away from obstacle
+            xdot_r = self.reactive_magnitude*self.reactive_direction
+
+            # If the robot is about in the reaction stage, keep the equiblirium positon
+            # otherwise update xe trajectory for the robot to track
+            if np.isclose(self.reactive_magnitude, 0.):
+                self.xe = next(self.trajectory_generation)
+
             # desired velocity that pulls robot toward equiblirium postion
             xdot_d = self.stiffness*(self.xe - x)/self.damping_coeff
             xdot_d = np.clip(xdot_d, -self.speed_limit, self.speed_limit)
-            # reactive velocity (constrained on pre-planned direction) that pushes robot away from obstacle
-            xdot_r = self.reactive_magnitude*self.reactive_direction
             # sum of velocity vector (desired + reactive velocity)
             xdot = xdot_d + xdot_r
-        
-            # TODO: publish xdot
-            self.setpoint_velocity.x = xdot[0]
-            self.setpoint_velocity.y = xdot[1]
-            self.setpoint_velocity.z = xdot[2]
-            self.vel_publisher_.publish(self.setpoint_velocity)
-
             x_target = x + self.ts*xdot
             x_target = self.validate_reactive_path(x_target)
             self.get_logger().info('Tartget velocity: {0}\t Target position: {1}'.format(xdot, x_target))
@@ -92,7 +95,7 @@ class DistanceReactiveController(JointControllerBase):
             yield joint
                     
     def timer_callback(self):   
-        joint_cmd = next(self.trajectory_generation)
+        joint_cmd = next(self.joint_command_generation)
         self.joint_msg.data = [joint_cmd[0], joint_cmd[1], joint_cmd[2], joint_cmd[3]]
         self.get_logger().info('Publishing command!')
         self.publisher_.publish(self.joint_msg)

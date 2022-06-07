@@ -113,13 +113,13 @@ class DepthSensing(Node):
     # from the video_frames topic. The queue size is 10 messages.
     self.subscription = self.create_subscription(
       Image, 
-      '/cam3/video_frames', 
+      'video_frames', 
       self.listener_callback, 
       10)
     self.subscription # prevent unused variable warning
 
-    self.publisher_distance = self.create_publisher(Float64, '/protac_perception/reactive_data', 10)
-    self.publisher_depth = self.create_publisher(Float64, '/protac_perception/closest_depth', 10)
+    self.publisher_reactive_data = self.create_publisher(Float64, '/protac_perception/reactive_data', 10)
+    self.publisher_distance = self.create_publisher(Float64, '/protac_perception/closest_distance', 10)
 
     self.start_time = time.time()
 
@@ -172,6 +172,7 @@ class DepthSensing(Node):
     observed_regions_points = np.argwhere(observed_regions)
     
     reactive_data = Float64()
+    distance = Float64()
     if len(point_radii[observed_regions]) > 0:
         closest_distance =  np.min(point_radii[observed_regions])
         closest_depth = np.min(depth_map[observed_regions])
@@ -182,14 +183,14 @@ class DepthSensing(Node):
             reactive_data.data = -repulsive_vector_magnitude
         else:
             reactive_data.data = repulsive_vector_magnitude
-        # distance = Float64()
+        distance.data = float(closest_distance)
         # depth = Float64()
-        # distance.data = float(closest_distance)
         # depth.data = float(closest_depth)
-        # self.publisher_depth.publish(depth)
+        
     else:
         reactive_data.data = 0.
-    self.publisher_distance.publish(reactive_data)
+    self.publisher_distance.publish(distance)
+    self.publisher_reactive_data.publish(reactive_data)
     print("Estimated reactive vector magnitude: {0:.2f}".format(reactive_data.data))
     
     fps = int(sum(self.previous_fps) / self.num_fps_frames) if self.show_fps else None

@@ -16,12 +16,12 @@ class DistanceReactiveController(JointControllerBase):
         self.publisher_ = self.create_publisher(Float64MultiArray, '/position_controller/commands', 10)
         self.vel_publisher_ = self.create_publisher(Vector3, '/position_controller/velocity_setpoint', 10)
 
-        self.subscription_cam3 = self.create_subscription(
+        self.subscription_action = self.create_subscription(
             Float64,
-            '/protac_perception/reactive_data',
-            self.cam3_distance_callback,
+            '/protac_perception/action',
+            self.action_callback,
             10)
-        self.subscription_cam3  # prevent unused variable warning
+        self.subscription_action  # prevent unused variable warning
 
         # load kinematics module for protac (protac_kinematics package)
         self.kinematics = Kinematics()
@@ -36,8 +36,6 @@ class DistanceReactiveController(JointControllerBase):
 
         # controller paramters
         self.xe = np.array([-0.131, -0.01, 0.518]) # equiblirium position
-        self.stiffness = 10. # 5.5
-        self.damping_coeff = 0.5
         self.speed_limit = 0.5 # limits for velocity
         self.x_limit_upper = np.array([-0.131, 0.04, 0.518]) # reaction limit
         self.x_limit_lower = np.array([-0.131, -0.04, 0.518]) # reaction limit
@@ -70,19 +68,16 @@ class DistanceReactiveController(JointControllerBase):
         while True:
             # current state (position of the robot)
             x = self.get_eef_positions()
-            # desired velocity that pulls robot toward equiblirium postion
-            xdot_d = self.stiffness*(self.xe - x)/self.damping_coeff
-            xdot_d = np.clip(xdot_d, -self.speed_limit, self.speed_limit)
-            # reactive velocity (constrained on pre-planned direction) that pushes robot away from obstacle
+            # TODO: reactive velocity inferred from the ACTION detected
             xdot_r = self.reactive_magnitude*self.reactive_direction
             # sum of velocity vector (desired + reactive velocity)
-            xdot = xdot_d + xdot_r
+            xdot = xdot_r
         
-            # TODO: publish xdot
-            self.setpoint_velocity.x = xdot[0]
-            self.setpoint_velocity.y = xdot[1]
-            self.setpoint_velocity.z = xdot[2]
-            self.vel_publisher_.publish(self.setpoint_velocity)
+            # # publish xdot
+            # self.setpoint_velocity.x = xdot[0]
+            # self.setpoint_velocity.y = xdot[1]
+            # self.setpoint_velocity.z = xdot[2]
+            # self.vel_publisher_.publish(self.setpoint_velocity)
 
             x_target = x + self.ts*xdot
             x_target = self.validate_reactive_path(x_target)
@@ -97,7 +92,8 @@ class DistanceReactiveController(JointControllerBase):
         self.get_logger().info('Publishing command!')
         self.publisher_.publish(self.joint_msg)
 
-    def cam3_distance_callback(self, msg):
+    def action_callback(self, msg):
+        # TODO: Action callback
         # self.get_logger().info('I heard: "%s"' % msg.data)
         self.reactive_magnitude = msg.data
         
