@@ -90,6 +90,8 @@ def mcl(nodal_displacements, threshold):
     # extract multiple "apparent" contact regions, each region represented by node indexes
     contact_regions = [np.where(labelled_graph==patch_id)[0] for patch_id in range(1, no_of_contacts+1)]
     contact_positions = list()
+    contact_radial_vectors = list()
+    contact_depths = list()
     for contact_region in contact_regions:
         if len(contact_region) > 5:
             # extract the node index which maximizes the magnitude of nodal displacement
@@ -97,5 +99,8 @@ def mcl(nodal_displacements, threshold):
             contact_location_id = np.where(norm_deviations==contact_depth)[0].squeeze()
             # 3D-coordinated contact position of given contact region
             contact_position = init_positions[contact_location_id]
+            contact_radial_vector = radial_vectors[contact_location_id]
             contact_positions.append(contact_position)
-    return no_of_contacts, contact_positions
+            contact_radial_vectors.append(contact_radial_vector)
+            contact_depths.append(contact_depth)
+    return contact_radial_vectors, contact_positions, contact_depths
