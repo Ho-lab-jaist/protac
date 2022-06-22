@@ -2,14 +2,14 @@ import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import Float64MultiArray
-from std_msgs.msg import Float64
+from std_msgs.msg import String
 from geometry_msgs.msg import Vector3
 import numpy as np
 
 from protac_kinematics.kinematics import Kinematics
 from .controllers import JointControllerBase
 
-class DistanceReactiveController(JointControllerBase):
+class InteractionController(JointControllerBase):
     def __init__(self, namespace='/', timeout=5.0):
         super().__init__(namespace, timeout=timeout)
 
@@ -17,11 +17,18 @@ class DistanceReactiveController(JointControllerBase):
         self.vel_publisher_ = self.create_publisher(Vector3, '/position_controller/velocity_setpoint', 10)
 
         self.subscription_action = self.create_subscription(
-            Float64,
+            String,
             '/protac_perception/action',
             self.action_callback,
             10)
         self.subscription_action  # prevent unused variable warning
+
+        self.subscription_press_direction = self.create_subscription(
+            Vector3,
+            '/protac_perception/press_direction',
+            self.press_direction_callback,
+            10)
+        self.subscription_press_direction  # prevent unused variable warning
 
         # load kinematics module for protac (protac_kinematics package)
         self.kinematics = Kinematics()
@@ -41,10 +48,14 @@ class DistanceReactiveController(JointControllerBase):
         self.x_limit_lower = np.array([-0.131, -0.04, 0.518]) # reaction limit
         # pre-planned direction of distance
         self.reactive_direction = (self.x_limit_upper-self.xe)/np.linalg.norm(self.x_limit_upper-self.xe)
-        # initialize reactive magnitude
-        self.reactive_magnitude = 0.
+        # initialize action detected
+        self.action  = "No"
+        # initialize interaction velocity
+        self.twist_iac = np.array([0., 0., 0., 0., 0., 0.])
         # initialize the generator of reactive-based joint commands
         self.trajectory_generation = self.jonit_trajectory_generation()
+        # initialize press direction
+        self.press_direction = np.array([0., 0., 0.])
 
         # message for joint position control
         self.joint_msg = Float64MultiArray()
@@ -67,40 +78,77 @@ class DistanceReactiveController(JointControllerBase):
     def jonit_trajectory_generation(self):
         while True:
             # current state (position of the robot)
-            x = self.get_eef_positions()
-            # TODO: reactive velocity inferred from the ACTION detected
-            xdot_r = self.reactive_magnitude*self.reactive_direction
-            # sum of velocity vector (desired + reactive velocity)
-            xdot = xdot_r
+            # x = self.get_eef_positions()
+            # Rsb = self.get_eef_orientation()
+            cjoint = self.get_joint_positions() # current joint state
+            # get jacobian body
+            Jbody = self.kinematics.JacobianBody(cjoint)
+            # intearaction velocity inferred from the ACTION detected
+            if np.isclose(np.linalg.norm(self.twist_iac[:3]), 0.):
+                jointdot = np.dot(np.linalg.pinv(Jbody[3:,:]), self.twist_iac[3:])
+            else:
+                jointdot = np.dot(np.linalg.pinv(Jbody), self.twist_iac)
         
-            # # publish xdot
-            # self.setpoint_velocity.x = xdot[0]
-            # self.setpoint_velocity.y = xdot[1]
-            # self.setpoint_velocity.z = xdot[2]
-            # self.vel_publisher_.publish(self.setpoint_velocity)
-
-            x_target = x + self.ts*xdot
-            x_target = self.validate_reactive_path(x_target)
-            self.get_logger().info('Tartget velocity: {0}\t Target position: {1}'.format(xdot, x_target))
+            joint = cjoint + self.ts*jointdot
+            self.get_logger().info('Tartget velocity: {0}'.format(np.dot(Jbody, jointdot)))
             # calculate jont position (by inverse kinematics)
-            joint = self.kinematics.FindClosestIksolution(x_target, self.get_joint_positions())
+            # joint = self.kinematics.FindClosestIksolution(x_target, self.get_joint_positions())
             yield joint
                     
     def timer_callback(self):   
         joint_cmd = next(self.trajectory_generation)
         self.joint_msg.data = [joint_cmd[0], joint_cmd[1], joint_cmd[2], joint_cmd[3]]
-        self.get_logger().info('Publishing command!')
+        # self.get_logger().info('Publishing command!')
         self.publisher_.publish(self.joint_msg)
 
     def action_callback(self, msg):
-        # TODO: Action callback
-        # self.get_logger().info('I heard: "%s"' % msg.data)
-        self.reactive_magnitude = msg.data
-        
+        x = 0.
+        y = 0.
+        z = 0.
+        wx = 0.
+        wy = 0.
+        wz = 0.
+        self.twist_iac = np.array([0., 0., 0., 0., 0., 0.])
+        self.action = msg.data
+        # self.get_logger().info('I heard: "%s"' % self.action)
+        if self.action == "Stroke(-)":
+            # self.twist_iac = np.array([-0.5, -0., 0., 0., 0., 0.])
+            # self.twist_iac = np.array([0., 0., 0., 0., -0., -0.2])
+            z = -0.2
+        elif self.action == "Stroke(+)":
+            # self.twist_iac = np.array([0.5, 0., 0., 0., 0., 0.])
+            # self.twist_iac = np.array([0., 0., 0., 0., 0., 0.2])    
+            z = 0.2
+        elif self.action == "Press":
+            # self.twist_iac = np.array([0., 0., 0., 0., 0., 0.])
+            # self.twist_iac[3:] = 0.12*self.press_direction
+            x = 0.35*(self.press_direction[0]/20)
+            y = 0.35*(self.press_direction[1]/20)
+        elif self.action == "My(+)":
+            wy = 1.
+        elif self.action == "My(-)":
+            wy = -1.
+        elif self.action == "Mx(+)":
+            wx = 1.
+        elif self.action == "Mx(-)":
+            wx = -1.
+        elif self.action == "No":
+            pass
+
+        rotation = 0.5*np.array([wx, wy, wz])
+        velocity = np.array([x, y, z])
+        self.twist_iac[:3] = rotation
+        self.twist_iac[3:] = velocity
+
+
+    def press_direction_callback(self, msg):
+        self.press_direction[0] = msg.x
+        self.press_direction[1] = msg.y
+        self.press_direction[2] = msg.z
 
 def main(args=None):
     rclpy.init(args=args)
-    position_controller = DistanceReactiveController()
+    position_controller = InteractionController()
     rclpy.spin(position_controller)
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically

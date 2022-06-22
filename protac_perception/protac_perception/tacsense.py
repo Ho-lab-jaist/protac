@@ -267,10 +267,8 @@ class ForceSensing(object):
         intensity_force_vector = np.linalg.norm(estimated_focrce_vector, axis=1)
         single_contact_force = np.max(intensity_force_vector)
         contact_location_id = np.where(intensity_force_vector==single_contact_force)[0].squeeze()
-        print('contact location id: {0}'.format(contact_location_id))
         # 3D-coordinated contact position of given contact region
         single_contact_position = self.init_positions[contact_location_id]
-        print('initial position: {0}'.format(single_contact_position))
         return single_contact_force, single_contact_position
 
     # def detect_contact(self):

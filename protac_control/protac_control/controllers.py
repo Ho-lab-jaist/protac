@@ -28,6 +28,7 @@ class JointControllerBase(Node):
             '%sjoint_states' % self.ns, 
             self.joint_states_cb, 
             1)
+    self._js_sub
     # self.get_logger().info('Waiting for [%sjoint_states] topic' % self.ns)
     # start_time = self.get_clock().now().nanoseconds
     # while not hasattr(self, '_joint_names'):
@@ -70,6 +71,14 @@ class JointControllerBase(Node):
     @return: Current 3D eef positions of the Protac robot.
     """
     return self.kinematics.FKinSpace(self.get_joint_positions())[:3, 3]
+
+  def get_eef_orientation(self):
+    """
+    Returns the current end-effector orientation of the Protac robot.
+    @rtype: numpy.ndarray
+    @return: rotation matrix Rsb.
+    """
+    return self.kinematics.FKinSpace(self.get_joint_positions())[:3, :3]
   
   def joint_states_cb(self, msg):
     """

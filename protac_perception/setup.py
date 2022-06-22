@@ -27,6 +27,7 @@ setup(
             'img_publisher = protac_perception.img_pub:main',
             'contact_sensing_node = protac_perception.contact_sensing_node:main',
             'action_detection_node = protac_perception.action_detection_node:main',
+            'force_sensing_node = protac_perception.force_sensing_node:main',
             'obstacle_sensing_node = protac_perception.obstacle_sensing_node:main',
             'distance_sensing_node = protac_perception.distance_sensing_node:main',
             'image_display_node = protac_perception.image_display_node:main',

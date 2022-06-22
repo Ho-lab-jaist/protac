@@ -27,7 +27,7 @@ cam2:
 cam3: 
   img_publisher_node:
     ros__parameters:
-      image_undistored: true
+      image_undistored: false
       cam_id: 0
       width: 640
       height: 480
@@ -40,7 +40,7 @@ cam3:
 cam4: 
   img_publisher_node:
     ros__parameters:
-      image_undistored: true
+      image_undistored: false
       cam_id: 6
       width: 640
       height: 480

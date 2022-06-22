@@ -8,7 +8,7 @@ import os
 import yaml
 
 
-np.set_printoptions(precision=3, suppress=True)
+np.set_printoptions(precision=5, suppress=True)
 
 class Kinematics():
     def __init__(self):
@@ -219,7 +219,7 @@ def main():
     pw = np.dot(Rws, ps)
     # P = [0.3, -0.2, 0.4]
     # pw_target = [0.223, 0.04, 0.459]
-    pw_target = [0.273, -0.04,   0.459]
+    pw_target = [0.705, -0.01,   -0.115]
     ps_target = np.dot(Rws.T, pw_target)
     # i_thetalist = kin.IKinPos(T_eef[:3, 3])
     i_thetalist = kin.IKinPos(ps_target)

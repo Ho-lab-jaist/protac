@@ -34,6 +34,8 @@ setup(
             'distance_reactive_control_node = protac_control.distance_reactive_control_node:main',
             'reflex_control_node = protac_control.reflex_control_node:main',
             'distance_aware_speed_control_node = protac_control.distance_aware_speed_control_node:main',
+            'interaction_control_node = protac_control.interaction_control_node:main',
+            'twist_control_node = protac_control.twist_control_node:main',
         ],
     },
 )
