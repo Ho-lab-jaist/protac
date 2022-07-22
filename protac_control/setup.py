@@ -32,10 +32,12 @@ setup(
             'online_position_control_node = protac_control.online_position_control_node:main',
             'human_aware_speed_control_node = protac_control.human_aware_speed_control_node:main',
             'distance_reactive_control_node = protac_control.distance_reactive_control_node:main',
+            'force_reactive_control_node = protac_control.force_reactive_control_node:main',
             'reflex_control_node = protac_control.reflex_control_node:main',
             'distance_aware_speed_control_node = protac_control.distance_aware_speed_control_node:main',
             'interaction_control_node = protac_control.interaction_control_node:main',
             'twist_control_node = protac_control.twist_control_node:main',
+            'pushing_control_node = protac_control.pushing_control_node:main',
         ],
     },
 )

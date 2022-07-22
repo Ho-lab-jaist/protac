@@ -48,6 +48,6 @@ def generate_launch_description():
     return LaunchDescription([
         # img1_publisher,
         # img2_publisher,
-        # img3_publisher,
+        img3_publisher,
         img4_publisher,
     ])

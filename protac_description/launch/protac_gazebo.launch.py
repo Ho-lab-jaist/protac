@@ -4,12 +4,12 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
-from launch.event_handlers import OnProcessExit
+from launch.event_handlers import OnProcessExit, OnProcessStart
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 
 import xacro
-
+import yaml
 
 def generate_launch_description():
     robot_name = "protac"
@@ -23,6 +23,12 @@ def generate_launch_description():
     # robot_description_config = xacro.parse(open(robot_description))
     # xacro.process_doc(robot_description_config)
 
+    waypoints_file = os.path.join(
+        get_package_share_directory(
+            package_name), "controllers", "waypoints.yaml"
+    )
+    with open(waypoints_file) as file:
+        wayponits_data = yaml.full_load(file)
 
     spawn_entity = Node(
         package="gazebo_ros",
@@ -30,6 +36,17 @@ def generate_launch_description():
         arguments=["-topic", "robot_description",
                    "-entity", "protac"],
         output="screen"
+    )
+
+    rviz_node = Node(
+            package="rviz2",
+            executable="rviz2",
+            name="rviz2",
+            arguments=["-d", rviz_config],
+            output={
+                "stdout": "screen",
+                "stderr": "log",
+            },
     )
 
     # Launching gazebo.launch.py is comsumed more than 1 minute somehow...
@@ -40,13 +57,13 @@ def generate_launch_description():
     )
 
     joint_trajectory_controller = ExecuteProcess(
-        cmd=["ros2", "control", "load_controller", "--set-state", "configure",
+        cmd=["ros2", "control", "load_controller", "--set-state", "start",
              "joint_trajectory_controller"],
         output="screen"
     )
 
     velocity_controller = ExecuteProcess(
-        cmd=["ros2", "control", "load_controller", "--set-state", "start",
+        cmd=["ros2", "control", "load_controller", "--set-state", "configure",
              "velocity_controller"],
         output="screen"
     )
@@ -54,6 +71,14 @@ def generate_launch_description():
     position_controller = ExecuteProcess(
         cmd=["ros2", "control", "load_controller", "--set-state", "configure",
              "position_controller"],
+        output="screen"
+    )
+
+    send_goal = ExecuteProcess(
+        cmd=["ros2", "action", "send_goal", "/joint_trajectory_controller/follow_joint_trajectory", 
+             "control_msgs/action/FollowJointTrajectory", "-f",
+             "{0}".format(wayponits_data)
+            ],
         output="screen"
     )
 
@@ -86,6 +111,13 @@ def generate_launch_description():
             )
         ),
 
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=position_controller,
+                on_exit=[send_goal],
+            )
+        ),
+
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory("gazebo_ros"), "launch"), "/gazebo.launch.py"]),
@@ -101,15 +133,6 @@ def generate_launch_description():
 
         spawn_entity,
 
-        Node(
-            package="rviz2",
-            executable="rviz2",
-            name="rviz2",
-            arguments=["-d", rviz_config],
-            output={
-                "stdout": "screen",
-                "stderr": "log",
-            },
-        )
+        rviz_node
 
     ])

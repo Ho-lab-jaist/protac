@@ -166,11 +166,56 @@ ros2 action send_goal /joint_trajectory_controller/follow_joint_trajectory contr
   }
 }"
 
-ros2 control switch_controllers --start joint_state_broadcaster --stop joint_trajectory_controller --start position_controller
+ros2 action send_goal /joint_trajectory_controller/follow_joint_trajectory control_msgs/action/FollowJointTrajectory -f "{
+  trajectory: {
+    joint_names: [joint1, joint2, joint3, joint4],
+    points: [
+      { positions: [-1.570796327, 0.785398163, 2.443460953, 0.], time_from_start: { sec: 8 } }
+    ]
+  }
+}"
 
+
+ros2 action send_goal /joint_trajectory_controller/follow_joint_trajectory control_msgs/action/FollowJointTrajectory -f "{
+  trajectory: {
+    joint_names: [joint1, joint2, joint3, joint4],
+    points: [
+      { positions: [-1.570796327, -0.523598776, -0.523598776, 0.], time_from_start: { sec: 8 } }
+    ]
+  }
+}"
+
+ros2 action send_goal /joint_trajectory_controller/follow_joint_trajectory control_msgs/action/FollowJointTrajectory -f "{
+  trajectory: {
+    joint_names: [joint1, joint2, joint3, joint4],
+    points: [
+      { positions: [-1.570796327, 0, 0, 0.], time_from_start: { sec: 8 } }
+    ]
+  }
+}"
+
+
+ros2 control switch_controllers --start joint_state_broadcaster --stop joint_trajectory_controller --start position_controller
 ros2 control switch_controllers --start joint_state_broadcaster --start joint_trajectory_controller --stop position_controller
 
-[[-0.0 -0.   1   0.705]
- [-0.0   1   0   -0.1]
- [-1.  -0.0 -0  -0.215]
- [ 0.   0.   0.     1.]]
+ros2 control switch_controllers --start joint_state_broadcaster --stop joint_trajectory_controller --start velocity_controller
+ros2 control switch_controllers --start joint_state_broadcaster --start joint_trajectory_controller --stop velocity_controller
+
+## COMMAND TO POSITION AT WHICH FORCE-REACTIVE CONTROLLER IS APLLIED 
+ros2 action send_goal /joint_trajectory_controller/follow_joint_trajectory control_msgs/action/FollowJointTrajectory -f "{
+  trajectory: {
+    joint_names: [joint1, joint2, joint3, joint4],
+    points: [
+      { positions: [-1.570796327, 0., -1.570796327, 0.], time_from_start: { sec: 10 } }
+    ]
+  }
+}"
+
+ros2 action send_goal /joint_trajectory_controller/follow_joint_trajectory control_msgs/action/FollowJointTrajectory -f "{
+  trajectory: {
+    joint_names: [joint1, joint2, joint3, joint4],
+    points: [
+      { positions: [-1.570796327, 0., 0, 0.], time_from_start: { sec: 10 } }
+    ]
+  }
+}"

@@ -41,7 +41,7 @@ cam4:
   img_publisher_node:
     ros__parameters:
       image_undistored: false
-      cam_id: 6
+      cam_id: 8
       width: 640
       height: 480
       k_new: 0.9

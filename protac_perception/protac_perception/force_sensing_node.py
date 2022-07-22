@@ -174,12 +174,13 @@ class ForcePerception(Node):
 
     contact_force, contact_position = self.force_sensing.compute_contact_force(tac_image)
     filtered_contact_force = self.live_lfilter(contact_force)
-    if contact_position[1] > 0:
-        contact_force = -contact_force
-        filtered_contact_force = -filtered_contact_force
-    
-    self.contact_force_data.data = np.float64(contact_force)
-    self.filtered_contact_force_data.data = np.float64(filtered_contact_force)
+    # if contact_position[1] > 0:
+    #     contact_force = -contact_force
+    #     filtered_contact_force = -filtered_contact_force
+    if abs(filtered_contact_force) < 0.15:
+        filtered_contact_force = 0.
+    self.contact_force_data.data = np.float64(-contact_force)
+    self.filtered_contact_force_data.data = np.float64(-filtered_contact_force)
     self.contact_position_data.x = contact_position[0]
     self.contact_position_data.y = contact_position[1]
     self.contact_position_data.z = contact_position[2]

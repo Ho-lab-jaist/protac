@@ -59,5 +59,5 @@ def generate_launch_description():
         # img1_show,
         # img2_show,
         img3_show,
-        # img4_show,
+        img4_show,
     ])

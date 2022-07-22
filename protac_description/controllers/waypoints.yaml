@@ -1,0 +1,15 @@
+trajectory:
+  joint_names: 
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+  points:
+    -
+      positions:
+        - -1.570796327 
+        - -0.523598776
+        - -0.523598776
+        - 0.
+      time_from_start: 
+        sec: 8  

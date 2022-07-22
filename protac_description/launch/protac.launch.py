@@ -4,8 +4,11 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.actions import ExecuteProcess, RegisterEventHandler
+from launch.event_handlers import OnProcessExit, OnProcessStart
 
 import xacro
+import yaml
 
 
 def generate_launch_description():
@@ -22,6 +25,21 @@ def generate_launch_description():
             package_name), "controllers", "controllers.yaml"
     )
 
+    # waypoints_file = os.path.join(
+    #     get_package_share_directory(
+    #         package_name), "controllers", "waypoints.yaml"
+    # )
+    # with open(waypoints_file) as file:
+    #     wayponits_data = yaml.full_load(file)
+
+    # send_goal = ExecuteProcess(
+    #     cmd=["ros2", "action", "send_goal", "/joint_trajectory_controller/follow_joint_trajectory", 
+    #          "control_msgs/action/FollowJointTrajectory", "-f",
+    #          "{0}".format(wayponits_data)
+    #         ],
+    #     output="screen"
+    # )
+
     return LaunchDescription([
         Node(
             package="controller_manager",
@@ -36,25 +54,25 @@ def generate_launch_description():
 
         Node(
             package="controller_manager",
-            executable="spawner.py",
+            executable="spawner",
             arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
         ),
 
         Node(
             package="controller_manager",
-            executable="spawner.py",
-            arguments=["velocity_controller", "-c", "/controller_manager"],
+            executable="spawner",
+            arguments=["velocity_controller", "-c", "/controller_manager", "--stopped"],
         ),
 
         Node(
             package="controller_manager",
-            executable="spawner.py",
-            arguments=["position_controller", "-c", "/controller_manager"],
+            executable="spawner",
+            arguments=["position_controller", "-c", "/controller_manager", "--stopped"],
         ),
 
         Node(
             package="controller_manager",
-            executable="spawner.py",
+            executable="spawner",
             arguments=["joint_trajectory_controller", "-c", "/controller_manager"],
         ),
 
@@ -76,5 +94,4 @@ def generate_launch_description():
                 "stderr": "log",
             },
         )
-
     ])
