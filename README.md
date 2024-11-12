@@ -4,3 +4,11 @@ The repository includes ROS packages and nodes for ProTac sensing and perception
 *Note: The repository is under-reviewed by Transaction on Robotics.*
 
 ## ProTac perception
+For contact sensing, run the following ROS node
+```
+rosrun protac_perception contact_sensing_node.py
+```
+For distance / proximity, run
+```
+rosrun protac_perception distance_sensing_node.py
+```
