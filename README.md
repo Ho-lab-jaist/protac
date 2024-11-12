@@ -1,4 +1,6 @@
 # protac
-Description, kinematics and software for Protac robot, which includes programs for high-level sensing/perception and control of Protac arm.
+The repository includes ROS packages, nodes for ProTac sensing / perception (```protac_perception```), as well as control of Protac-interaged UR robot and new-constructed robot arm (```protac_control```). The ProTac design files can be accessed through ```protac_design``` directory.
 
-<span style="color: blue;">Note: The repository is under-reviewed by Transaction on Robotics.</span>
+*Note: The repository is under-reviewed by Transaction on Robotics.*
+
+## ProTac perception
