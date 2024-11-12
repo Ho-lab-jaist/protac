@@ -12,3 +12,22 @@ For distance / proximity, run
 ```
 rosrun protac_perception distance_sensing_node.py
 ```
+
+## ProTac control
+The optimization-based motion control with combined obstacle awareness and contact accomoation can be tested from
+```
+rosrun protac_control
+```
+
+The  human-robot interaction with ProTac flickering sensing can be tested from
+```
+rosrun protac_control
+```
+
+ProTac-driven reactive control and speed regulation can be run from
+```
+rosrun protac_control
+```
+```
+rosrun protac_control
+```
