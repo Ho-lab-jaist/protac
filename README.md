@@ -29,5 +29,5 @@ ProTac-driven reactive control and speed regulation can be run from
 rosrun protac_control
 ```
 ```
-rosrun protac_control
+rosrun protac_control distance_aware_speed_control_node.py
 ```
