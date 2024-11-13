@@ -1,0 +1,27 @@
+<launch>     
+
+    <arg name="cam1_id" default="2" doc="Camera 1 bus id: Default = 2" />
+    <arg name="cam2_id" default="4" doc="Camera 2 bus id: Default = 4" />
+    <arg name="skin_state" default="2" doc="Skin state: Default = 2" />
+
+    <!-- Start qp control node -->
+    <node pkg="protac_perception" type="protac_acquisition.py" name="protac_acquisition_1" output="screen">
+        <param name="cam_id" value="$(arg cam1_id)" />
+        <param name="skin_state" value="$(arg skin_state)" />
+        <remap from="protac/protac_info" to="protac/protac_info/cam1" />
+        <remap from="protac/rgb_image" to="protac/rgb_image/cam1" />
+        <remap from="protac/depth_image" to="protac/depth_image/cam1" />
+        <remap from="protac/obstacle_image" to="protac/obstacle_image/cam1" />
+        <remap from="protac/human_image" to="protac/human_image/cam1" />
+    </node>
+
+    <node pkg="protac_perception" type="protac_acquisition.py" name="protac_acquisition_2" output="screen">
+        <param name="cam_id" value="$(arg cam2_id)" />
+        <param name="skin_state" value="$(arg skin_state)" />
+        <remap from="protac/protac_info" to="protac/protac_info/cam2" />
+        <remap from="protac/rgb_image" to="protac/rgb_image/cam2" />
+        <remap from="protac/depth_image" to="protac/depth_image/cam2" />
+        <remap from="protac/obstacle_image" to="protac/obstacle_image/cam2" />
+        <remap from="protac/human_image" to="protac/human_image/cam2" />
+    </node>
+</launch>

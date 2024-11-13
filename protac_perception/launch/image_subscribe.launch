@@ -1,0 +1,27 @@
+<launch>     
+    <arg name="show_video" default="true" doc="show video" />
+    <arg name="save_video" default="false" doc="save video" />
+
+    <!-- Start qp control node -->
+    <node pkg="protac_perception" type="image_display.py" name="image_subscriber_1" output="screen">
+        <param name="cam" value="cam1" />
+        <param name="show_video" value="$(arg show_video)" />
+        <param name="save_video" value="$(arg save_video)" />
+        
+        <remap from="protac/rgb_image" to="protac/rgb_image/cam1" />
+        <remap from="protac/depth_image" to="protac/depth_image/cam1" />
+        <remap from="protac/obstacle_image" to="protac/obstacle_image/cam1" />
+        <remap from="protac/human_image" to="protac/human_image/cam1" />
+    </node>
+
+    <node pkg="protac_perception" type="image_display.py" name="image_subscriber_2" output="screen">
+        <param name="cam" value="cam2" />
+        <param name="show_video" value="$(arg show_video)" />
+        <param name="save_video" value="$(arg save_video)" />
+
+        <remap from="protac/rgb_image" to="protac/rgb_image/cam2" />
+        <remap from="protac/depth_image" to="protac/depth_image/cam2" />
+        <remap from="protac/obstacle_image" to="protac/obstacle_image/cam2" />
+        <remap from="protac/human_image" to="protac/human_image/cam2" />
+    </node>
+</launch>
