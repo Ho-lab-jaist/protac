@@ -16,7 +16,7 @@ rosrun protac_perception distance_sensing_node.py
 ## ProTac control
 The optimization-based motion control with combined obstacle awareness and contact accomoation can be tested from
 ```
-rosrun protac_control
+rosrun ur_protac test_protac_qp_control_proximity.py
 ```
 
 The  human-robot interaction with ProTac flickering sensing can be tested from
