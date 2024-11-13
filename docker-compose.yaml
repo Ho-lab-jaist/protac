@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  tactlink_control:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: protac-control-img
+    container_name: protac-control-cnt
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      # X11 server
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      # Folders containing the code
+      - ./ur_protac/:/home/catkin_ws/src/ur_protac/
+      - ./protac_map/:/home/catkin_ws/src/protac_map/
+      - ./protac_perception/:/home/catkin_ws/src/protac_perception/
+      #- ./protac_interfaces/:/home/catkin_ws/src/protac_interfaces/
+    network_mode: host
+    ipc: host # share the memory with the host
+    restart: unless-stopped
+    privileged: true
+    stdin_open: true
+    tty: true
+    # gpus
+    runtime: nvidia
