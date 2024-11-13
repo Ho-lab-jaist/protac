@@ -21,7 +21,7 @@ rosrun ur_protac test_protac_qp_control_proximity.py
 
 The  human-robot interaction with ProTac flickering sensing can be tested from
 ```
-rosrun protac_control
+rosrun ur_protac test_protac_hri.py
 ```
 
 ProTac-driven reactive control and speed regulation can be run from
