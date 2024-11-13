@@ -1,0 +1,22 @@
+<launch>        
+    <!-- Start qp control node -->
+    <!-- <node pkg="ur_protac" type="test_protac_qp_control.py" name="qp_control" output="screen"/> -->
+
+    <!-- Start motionhri control node -->
+    <node pkg="ur_protac" type="protac_motion_control.py" name="motion_control" output="screen">
+        <remap from="protac/protac_info" to="protac/protac_info/cam1" />
+    </node>
+
+    <!-- Start data logging node -->
+    <node pkg="ur_protac" type="save_data_node.py" name="data_acquistion_node_1" output="screen" required="true">
+        <param name="cam" value="cam1" />
+        <remap from="protac/protac_info" to="protac/protac_info/cam1" />
+    </node>
+
+    <!-- Start data logging node -->
+    <node pkg="ur_protac" type="save_data_node.py" name="data_acquistion_node_2" output="screen" required="true">
+        <param name="cam" value="cam2" />
+        <remap from="protac/protac_info" to="protac/protac_info/cam2" />
+    </node>
+
+</launch>
